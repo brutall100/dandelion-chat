@@ -12,7 +12,6 @@ const db = mysql.createPool({
   database: process.env.DB_DATABASE,
 });
 
-// Middleware to parse JSON and urlencoded request bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,7 +38,6 @@ app.post("/save-message", async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
@@ -47,20 +45,3 @@ app.listen(port, () => {
 // http://localhost:9000
 // node server.js
 
-// Veikia sitas post
-// app.post("/save-message", async (req, res) => {
-//     try {
-//       const { user_message } = req.body; // Assuming user_message is a field in the request body
-
-//       // Now you can use 'user_message' as needed
-
-//       // Example: Log the user_message
-//       console.log("Received user message:", user_message);
-
-//       // You can also send a response back to the client if needed
-//       res.status(200).json({ message: "Message saved successfully", user_message });
-//     } catch (error) {
-//       console.error("Error saving message:", error);
-//       res.status(500).json({ error: "Internal Server Error" });
-//     }
-//   });

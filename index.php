@@ -22,7 +22,7 @@
             <ul id="chat-messages"></ul>
         </div>
         <div>
-            <form id="chat-form" method="POST" action="http://localhost:9001/save-message" >
+            <form id="chat-form" method="POST" action="http://localhost:9000/save-message" >
             <input id="chat-input-msg" name="user_message" autocomplete="off" />
             <button id="chat-button" type="submit">Send</button>
             </form>
@@ -36,9 +36,4 @@
     </div>
   </footer>
 </body>
-
-  <!-- <script type="text/javascript" src="client.js"></script> -->
 </html>
-
-
-
