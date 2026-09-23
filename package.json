@@ -1,10 +1,9 @@
 {
   "name": "chat_app",
   "version": "1.0.0",
-  "description": "Aldas wants to learn how chat app is working.",
-  "main": "client.js",
+  "description": "A small chat app built with Node.js, Express and MySQL.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "repository": {
@@ -15,8 +14,8 @@
     "chat",
     "app"
   ],
-  "author": "ALDAS",
-  "license": "ISC",
+  "author": "brutall100",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/brutall100/Chat_App/issues"
   },
