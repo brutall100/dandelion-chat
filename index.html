@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dandelion Chat – whisper straight to a friend</title>
+  <meta name="description" content="A peer-to-peer chat that runs in the browser. Plant a room, share the link, and your messages drift straight to your friend with no server and no database.">
+  <meta name="theme-color" content="#F6EEE7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1E1519" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+
+  <!-- Runs before the first paint so the saved theme never flashes -->
+  <script src="js/theme-init.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Overlock:ital,wght@0,400;0,700;1,400&family=Overlock+SC&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Living background: sunset glows + drifting dandelion seeds (filled by js/background.js) -->
+  <div class="meadow" aria-hidden="true">
+    <div class="meadow__glow meadow__glow--sun"></div>
+    <div class="meadow__glow meadow__glow--dusk"></div>
+    <div class="meadow__texture"></div>
+    <div class="meadow__seeds" id="seeds"></div>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Dandelion Chat home">
+      <img class="brand__icon" src="images/favicon.svg" alt="" width="36" height="36">
+      <span class="brand__name">Dandelion Chat</span>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+      <svg class="theme-toggle__sun" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.5"/>
+        <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>
+      </svg>
+      <svg class="theme-toggle__moon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/>
+      </svg>
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="hero reveal" aria-labelledby="hero-title">
+      <h1 class="hero__title" id="hero-title">Dandelion Chat</h1>
+      <p class="hero__lead">Make a wish, blow, and let the wind carry your words <em>straight</em> to a friend.
+        No server, no database. Just two browsers holding hands.</p>
+
+      <ul class="stats" aria-label="Room statistics">
+        <li class="stat">
+          <span class="stat__value" data-stat="seeds">0</span>
+          <span class="stat__label">seeds sent</span>
+        </li>
+        <li class="stat">
+          <span class="stat__value" data-stat="friends">0</span>
+          <span class="stat__label">friends in the meadow</span>
+        </li>
+        <li class="stat">
+          <span class="stat__value" data-stat="words">0</span>
+          <span class="stat__label">words carried</span>
+        </li>
+      </ul>
+    </section>
+
+    <div class="layout">
+      <!-- Room panel: who am I and where is my meadow -->
+      <section class="panel room reveal" aria-labelledby="room-title">
+        <h2 class="panel__title" id="room-title">Your meadow</h2>
+
+        <p class="status" id="status" data-state="idle" role="status">
+          <span class="status__dot" aria-hidden="true"></span>
+          <span class="status__text" id="status-text">Only this browser for now. Plant a meadow to invite a friend.</span>
+        </p>
+
+        <form class="field-row" id="name-form">
+          <label class="field">
+            <span class="field__label">Your name</span>
+            <input class="field__input" id="name-input" name="name" maxlength="24" autocomplete="nickname" required>
+          </label>
+        </form>
+
+        <div class="room__actions">
+          <button class="btn btn--primary" id="create-room" type="button">
+            <svg class="btn__icon btn__icon--sprout" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M12 21v-8M12 13c0-4 3-6 7-6 0 4-3 6-7 6ZM12 15c0-3-2.5-5-6-5 0 3 2.5 5 6 5Z"/>
+            </svg>
+            <span>Plant a meadow</span>
+          </button>
+        </div>
+
+        <div class="invite" id="invite" hidden>
+          <label class="field">
+            <span class="field__label">Invite link</span>
+            <input class="field__input field__input--mono" id="invite-link" readonly>
+          </label>
+          <button class="btn btn--ghost" id="copy-link" type="button">
+            <svg class="btn__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+            </svg>
+            <span id="copy-label">Copy link</span>
+          </button>
+        </div>
+
+        <p class="room__hint">Tip: open the link in a second tab to try it alone, or send it to a friend on another device.</p>
+      </section>
+
+      <!-- Chat panel -->
+      <section class="panel chat reveal" aria-labelledby="chat-title">
+        <h2 class="panel__title" id="chat-title">The breeze</h2>
+
+        <ol class="messages" id="messages" aria-live="polite" aria-relevant="additions">
+          <li class="messages__empty" id="messages-empty">No seeds yet. Write the first wish below.</li>
+        </ol>
+
+        <form class="composer" id="composer">
+          <label class="visually-hidden" for="message-input">Message</label>
+          <input class="field__input composer__input" id="message-input" name="message" maxlength="500"
+                 placeholder="Make a wish…" autocomplete="off" required>
+          <button class="btn btn--primary composer__send" id="send-button" type="submit">
+            <svg class="btn__icon btn__icon--seed" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M12 22v-9"/><circle cx="12" cy="22" r="1.2"/>
+              <path d="M12 13 6 5M12 13l6-8M12 13V3M12 13 3.5 9M12 13l8.5-4"/>
+            </svg>
+            <span>Blow</span>
+          </button>
+        </form>
+      </section>
+    </div>
+
+    <section class="how" aria-labelledby="how-title">
+      <h2 class="how__title reveal" id="how-title">How the wind works</h2>
+      <ol class="how__list">
+        <li class="card reveal">
+          <span class="card__step" aria-hidden="true">1</span>
+          <h3 class="card__title">Plant a meadow</h3>
+          <p>Your browser gets a secret room name from a tiny public “matchmaker” server (PeerJS). That is all the server ever sees.</p>
+        </li>
+        <li class="card reveal">
+          <span class="card__step" aria-hidden="true">2</span>
+          <h3 class="card__title">Share the link</h3>
+          <p>Your friend opens the link. The two browsers shake hands with WebRTC and open a direct data channel.</p>
+        </li>
+        <li class="card reveal">
+          <span class="card__step" aria-hidden="true">3</span>
+          <h3 class="card__title">Let it drift</h3>
+          <p>Messages fly browser to browser. Tabs in the same browser also talk through BroadcastChannel, even offline.</p>
+        </li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Made with WebRTC, a little wind and <a href="https://github.com/brutall100/dandelion-chat">open source code</a>. MIT © 2026 brutall100</p>
+  </footer>
+
+  <script src="js/vendor/peerjs.min.js" defer></script>
+  <script src="js/background.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/chat.js" defer></script>
+</body>
+</html>
